@@ -4,12 +4,12 @@ on:
   push:
     tags:
       - 'v*.*.*'
-      
+
 jobs:
   create-release:
     name: Package and Create Tagged Release
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Install archive tools
         run: sudo apt install zip
@@ -24,7 +24,7 @@ jobs:
         run: node .github/actions/bump-manifest-version.js
         env:
           TGT_RELEASE_VERSION: ${{ github.ref_name }}
-          
+
       - name: Push manifest change
         uses: EndBug/add-and-commit@v8
         with:
@@ -33,19 +33,19 @@ jobs:
           author_name: Manifest Bumper
           author_email: 41898282+github-actions[bot]@users.noreply.github.com
           message: 'chore: bump manifest version to ${{ github.ref_name }}'
-          
+
       - name: Update tag ref
         uses: EndBug/latest-tag@latest
         with:
           tag-name: ${{ github.ref_name }}
-          
+
       - name: Bundle files
         run: |
           mkdir -p ./temp/ox_target
           cp ./{LICENSE,README.md,fxmanifest.lua} ./temp/ox_target
-          cp -r ./{client,server,web} ./temp/ox_core
+          cp -r ./{client,server,web} ./temp/ox_target
           cd ./temp && zip -r ../ox_target.zip ./ox_target
-          
+
       - name: Create Release
         uses: 'marvinpinto/action-automatic-releases@v1.2.1'
         id: auto_release
